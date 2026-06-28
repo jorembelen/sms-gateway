@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "SMS Gateway (Stage 1)",
+    "description": "Self-hosted SMS gateway backend. All routes require the X-API-Key header.\n\nSet the `base_url` and `api_key` variables via the included environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "device_id", "value": "1" },
+    { "key": "message_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Register Device",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{api_key}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/devices/register",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "devices", "register"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fcm_token\": \"test-fcm-token-123\"\n}"
+        },
+        "description": "Creates or updates a device by its FCM token, marks it active, and updates last_seen_at.\n\nExample response (200):\n{\n  \"id\": 1,\n  \"status\": \"active\",\n  \"last_seen_at\": \"2026-06-28T08:22:28.000000Z\"\n}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set('device_id', pm.response.json().id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Send Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{api_key}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/messages/send",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "messages", "send"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"to\": \"+15551234567\",\n  \"content\": \"Hello from the SMS gateway\"\n}"
+        },
+        "description": "Validates the phone number and content, stores a pending message, and dispatches SendSmsJob.\n\nExample response (201):\n{\n  \"id\": 1,\n  \"status\": \"pending\",\n  \"to\": \"+15551234567\",\n  \"content\": \"Hello from the SMS gateway\"\n}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  pm.collectionVariables.set('message_id', pm.response.json().id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Device Callback (report status)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{api_key}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/devices/{{device_id}}/callback",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "devices", "{{device_id}}", "callback"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message_id\": {{message_id}},\n  \"status\": \"delivered\",\n  \"failure_reason\": null\n}"
+        },
+        "description": "Simulates the phone reporting back the delivery status of a message.\nValid status values: sent, delivered, failed.\n\nExample response (200):\n{\n  \"id\": 1,\n  \"status\": \"delivered\",\n  \"failure_reason\": null,\n  \"to\": \"+15551234567\"\n}"
+      }
+    }
+  ]
+}
