@@ -282,39 +282,126 @@ Select the **SMS Gateway (Local)** environment and the requests are plug-and-pla
 The collection auto-captures `device_id` and `message_id` from responses so the
 callback request works without manual editing.
 
-## Admin Dashboard
+## Admin Login (2FA)
 
-The Laravel app includes a Livewire-powered admin panel at `/admin` for monitoring
-messages and devices in real time. It is read-only (no data modifications).
+The admin panel at `/admin` is protected by **password + SMS OTP two-factor authentication**.
+OTP codes are delivered via this app's own SMS pipeline (the same `messages`/`SendSmsJob` flow
+used for outbound messages), making this the first production use of that pipeline.
 
-### Accessing the dashboard
+### How the flow works
 
-Navigate to `/admin` in your browser. You will be redirected to `/admin/login` if
-not authenticated.
-
-### Logging in
-
-The admin area uses a single hardcoded password stored in `.env`. There is no user
-database — a valid password sets a session flag.
-
-**Default credential (change immediately):**
-
-```dotenv
-ADMIN_PASSWORD=change-me-now
+```
+/admin/login  — enter email + password
+      │
+      ▼  (credentials OK → OTP generated, SMS dispatched)
+/admin/otp    — enter the 6-digit code from your phone
+      │
+      ▼  (code OK → Auth::login(), session regenerated)
+/admin/       — dashboard
 ```
 
-Set this in `.env` on your server before deploying:
+1. **Step 1 (`/admin/login`)** — submit email + password. On success a 6-digit code is
+   generated cryptographically (`random_int`), stored **hashed** in `otp_codes`, and sent
+   via SMS to the admin's registered phone number. You are placed in a pending state
+   (`admin_otp_pending` session key) — you are NOT logged in yet.
+
+2. **Step 2 (`/admin/otp`)** — submit the 6-digit code. The code must be:
+   - entered within 5 minutes of issue
+   - not previously consumed
+   - within 5 attempts (locked after 5 wrong guesses — request a new code)
+
+   On success the session is regenerated, `Auth::login()` is called, and you land on
+   the dashboard. The OTP is marked `consumed_at` and cannot be reused.
+
+3. **Rate limiting** — a maximum of 3 OTP SMS sends per user per 10-minute window.
+   Hitting "Resend code" too many times will show a wait message.
+
+### Seeding the admin user
+
+Run the seeder to create (or re-create) the admin account:
 
 ```bash
-# generate a strong password
-php -r "echo bin2hex(random_bytes(20)) . PHP_EOL;"
-# then update .env
-ADMIN_PASSWORD=<output from above>
+php artisan db:seed --class=AdminUserSeeder
 ```
 
-To log out, click **Log out** in the sidebar or POST to `/admin/logout`.
+Default credentials seeded:
 
-### Pages
+| Field    | Value                   |
+|----------|-------------------------|
+| Email    | `admin@smsgateway.local` |
+| Password | `change-me-now`         |
+| Phone    | `+639000000000` (placeholder — update before use) |
+
+**Update the phone number before first login** — open Tinker or run a migration to set
+the real number, otherwise OTP delivery will fail:
+
+```bash
+php artisan tinker
+>>> \App\Models\User::where('email','admin@smsgateway.local')->update(['phone_number'=>'+639XXXXXXXXX']);
+```
+
+**Change the password** via Tinker as well:
+
+```bash
+>>> \App\Models\User::where('email','admin@smsgateway.local')->update(['password'=> bcrypt('your-new-password')]);
+```
+
+### Break-glass fallback (REQUIRED reading if your SMS device goes offline)
+
+> **The OTP delivery depends on the single registered Android device being online and
+> the gateway app being active.** If the device is off, out of battery, or the app was
+> killed, no OTP SMS will arrive — and you could be locked out of the very dashboard
+> you need to diagnose the problem.
+
+**Break-glass procedure (Option A — artisan command, requires SSH/server access):**
+
+This generates a valid OTP code directly in the database, bypassing SMS delivery entirely.
+It uses exactly the same OTP verification code path — no special bypass logic.
+
+```bash
+# SSH to the server, then:
+php artisan admin:bypass-otp
+# or, if you have multiple users:
+php artisan admin:bypass-otp --email=admin@smsgateway.local
+```
+
+Output:
+
+```
+  ⚠  BREAK-GLASS OTP — EMERGENCY USE ONLY
+
+  User   : admin@smsgateway.local
+  Code   : 482915
+  Valid  : 15 minutes
+  URL    : /admin/otp
+```
+
+**Procedure step-by-step:**
+
+1. In your browser, go to `/admin/login` and enter your **password** as normal.
+2. You land on `/admin/otp` (SMS never arrives).
+3. SSH to the server and run `php artisan admin:bypass-otp`.
+4. Copy the 6-digit code from the terminal output.
+5. Enter it in the browser within 15 minutes.
+6. You are logged in. Investigate why the SMS device is offline from the dashboard.
+
+**Why Option A?** It requires server/SSH access — the same access you would need to
+restart the app anyway. It leaves no plaintext credentials in log files (unlike a
+logging-based fallback). The artisan command is not web-exposed. The generated code
+goes through the same hash-verified OTP flow, so there is no separate code path to audit.
+
+**Optional logging fallback (Option B — disabled by default):**
+
+If you also want a log-file fallback for development or extreme emergencies, add to `.env`:
+
+```dotenv
+OTP_LOG_FALLBACK=true
+```
+
+When set, the plaintext OTP code is written to `storage/logs/laravel.log` at the INFO
+level on each generation. **Leave this off in production.** It is opt-in and off by default.
+
+### Admin panel pages
 
 | URL | Component | Description |
 | --- | --------- | ----------- |
@@ -322,11 +409,6 @@ To log out, click **Log out** in the sidebar or POST to `/admin/logout`.
 | `/admin/messages` | Messages | Full paginated table with live filters: phone search, status dropdown, date range |
 | `/admin/devices` | Devices | Device table with FCM token display (truncated + copy button) |
 | `/admin/failed` | Failed Messages | Failed-only view; failure reason always visible |
-
-### How to change the password
-
-Update `ADMIN_PASSWORD` in `.env` and restart your PHP process (or run
-`php artisan config:clear` in development). No migration or database change needed.
 
 ## Project layout
 

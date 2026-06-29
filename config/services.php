@@ -50,6 +50,13 @@ return [
         'api_key' => env('API_GATEWAY_KEY'),
     ],
 
+    // OTP delivery: when SMS_GATEWAY_API_KEY is set, OTPs are sent via the
+    // external gateway at sms.joremapps.com instead of the local FCM pipeline.
+    // Useful for local dev where no Android device is registered locally.
+    'sms_gateway' => [
+        'api_key' => env('SMS_GATEWAY_API_KEY'),
+    ],
+
     'firebase' => [
         // Absolute or storage-relative path to the service account JSON file.
         'credentials' => env('FIREBASE_CREDENTIALS_PATH'),
