@@ -17,7 +17,7 @@ class VerifyApiKey
         $expected = config('services.gateway.api_key');
         $provided = $request->header('X-API-Key');
 
-        if (empty($expected) || ! is_string($provided) || ! hash_equals($expected, $provided)) {
+        if (! is_string($expected) || $expected === '' || ! is_string($provided) || ! hash_equals($expected, $provided)) {
             return response()->json(['error' => 'Invalid or missing API key.'], 401);
         }
 

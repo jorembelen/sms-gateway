@@ -17,7 +17,7 @@ class RegisterDeviceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fcm_token' => ['required', 'string', 'max:4096'],
+            'fcm_token' => ['required', 'string', 'max:255'],
         ];
     }
 }

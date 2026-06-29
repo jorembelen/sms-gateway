@@ -39,6 +39,10 @@ class DeviceController extends Controller
         /** @var Message $message */
         $message = Message::findOrFail($request->validated('message_id'));
 
+        if ($message->device_id !== null && $message->device_id !== $device->id) {
+            return response()->json(['error' => 'Message not assigned to this device.'], 403);
+        }
+
         $message->update([
             'status' => $request->validated('status'),
             'failure_reason' => $request->validated('failure_reason'),

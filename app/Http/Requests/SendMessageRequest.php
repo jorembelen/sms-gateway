@@ -11,6 +11,14 @@ class SendMessageRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'to' => trim((string) ($this->input('to') ?? '')),
+            'content' => trim((string) ($this->input('content') ?? '')),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */

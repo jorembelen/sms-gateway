@@ -282,6 +282,52 @@ Select the **SMS Gateway (Local)** environment and the requests are plug-and-pla
 The collection auto-captures `device_id` and `message_id` from responses so the
 callback request works without manual editing.
 
+## Admin Dashboard
+
+The Laravel app includes a Livewire-powered admin panel at `/admin` for monitoring
+messages and devices in real time. It is read-only (no data modifications).
+
+### Accessing the dashboard
+
+Navigate to `/admin` in your browser. You will be redirected to `/admin/login` if
+not authenticated.
+
+### Logging in
+
+The admin area uses a single hardcoded password stored in `.env`. There is no user
+database — a valid password sets a session flag.
+
+**Default credential (change immediately):**
+
+```dotenv
+ADMIN_PASSWORD=change-me-now
+```
+
+Set this in `.env` on your server before deploying:
+
+```bash
+# generate a strong password
+php -r "echo bin2hex(random_bytes(20)) . PHP_EOL;"
+# then update .env
+ADMIN_PASSWORD=<output from above>
+```
+
+To log out, click **Log out** in the sidebar or POST to `/admin/logout`.
+
+### Pages
+
+| URL | Component | Description |
+| --- | --------- | ----------- |
+| `/admin` | Dashboard | Stat cards (today's totals + success rate), 7-day volume chart, 10 most recent messages |
+| `/admin/messages` | Messages | Full paginated table with live filters: phone search, status dropdown, date range |
+| `/admin/devices` | Devices | Device table with FCM token display (truncated + copy button) |
+| `/admin/failed` | Failed Messages | Failed-only view; failure reason always visible |
+
+### How to change the password
+
+Update `ADMIN_PASSWORD` in `.env` and restart your PHP process (or run
+`php artisan config:clear` in development). No migration or database change needed.
+
 ## Project layout
 
 | Path | What |
