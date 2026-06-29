@@ -295,3 +295,10 @@ callback request works without manual editing.
 | `routes/api.php` | `/api/v1` route definitions |
 | `bootstrap/app.php` | Middleware alias + JSON error handlers |
 | `database/migrations/` | `devices` + `messages` schema |
+
+
+# run this from your local machine (Windows Git Bash or WSL)
+cat "c:/laragon/www/sms/storage/app/firebase/service-account.json" | ssh -i ./dev-instance-key.pem ubuntu@3.250.47.173 "mkdir -p /var/www/sms/storage/app/firebase && cat > /var/www/sms/storage/app/firebase/service-account.json"
+
+# Option 1 — write the file directly with sudo tee
+cat "c:/laragon/www/sms/storage/app/firebase/service-account.json" | ssh -i ./dev-instance-key.pem ubuntu@3.250.47.173 "sudo mkdir -p /var/www/sms/storage/app/firebase && sudo tee /var/www/sms/storage/app/firebase/service-account.json > /dev/null"
