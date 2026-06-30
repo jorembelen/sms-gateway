@@ -5,6 +5,7 @@ use App\Livewire\Admin\Auth\Login;
 use App\Livewire\Admin\Auth\VerifyOtp;
 use App\Livewire\Admin\BlastSms;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\QueueMonitor;
 use App\Livewire\Admin\Devices;
 use App\Livewire\Admin\FailedMessages;
 use App\Livewire\Admin\Messages;
@@ -32,4 +33,5 @@ Route::prefix('admin')->name('admin.')->middleware(AdminAuth::class)->group(func
     Route::get('/devices', Devices::class)->name('devices');
     Route::get('/failed', FailedMessages::class)->name('failed');
     Route::get('/blast', BlastSms::class)->name('blast');
+    Route::get('/queue', QueueMonitor::class)->name('queue');
 });
