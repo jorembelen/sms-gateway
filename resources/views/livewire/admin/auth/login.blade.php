@@ -1,10 +1,6 @@
 <div class="w-full max-w-sm mx-auto">
     <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-14 h-14 bg-primary-container rounded-xl mb-4">
-            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-            </svg>
-        </div>
+        <img src="/assets/logo.jpeg" alt="SMS Gateway" class="w-14 h-14 rounded-xl object-cover mx-auto mb-4" />
         <h1 class="text-2xl font-bold text-on-surface tracking-tight">SMS Gateway</h1>
         <p class="text-sm text-on-surface-variant mt-1">Admin Console</p>
     </div>

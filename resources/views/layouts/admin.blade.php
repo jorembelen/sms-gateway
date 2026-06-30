@@ -7,6 +7,11 @@
     <title>{{ $pageTitle ?? 'Admin' }} – SMS Gateway</title>
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="assets/favicon/site.webmanifest">
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -186,9 +191,7 @@
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
         class="fixed left-0 top-0 h-full z-40 flex flex-col bg-surface border-r border-outline-variant w-[280px] transition-transform duration-200 ease-in-out">
         <div class="p-gutter flex items-center gap-3">
-            <div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-white text-[20px]">sms</span>
-            </div>
+            <img src="/assets/logo.jpeg" alt="SMS Gateway" class="w-10 h-10 rounded object-cover flex-shrink-0" />
             <div>
                 <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface leading-tight">SMS Gateway</h1>
                 <p class="font-label-md text-label-md text-on-surface-variant">Admin Console</p>
