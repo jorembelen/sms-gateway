@@ -10,6 +10,14 @@ class Devices extends Component
 {
     use WithPagination;
 
+    public function toggleStatus(int $id): void
+    {
+        $device = Device::findOrFail($id);
+        $device->update([
+            'status' => $device->status === 'active' ? 'inactive' : 'active',
+        ]);
+    }
+
     public function deleteDevice(int $id): void
     {
         Device::findOrFail($id)->delete();

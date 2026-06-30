@@ -70,7 +70,7 @@ class BlastSms extends Component
     public function render(): \Illuminate\View\View
     {
         return view('livewire.admin.blast-sms', [
-            'devices' => Device::where('status', 'active')->whereNotNull('fcm_token')->latest('last_seen_at')->get(),
+            'devices' => Device::whereNotNull('fcm_token')->latest('last_seen_at')->get(),
         ])->layout('layouts.admin', ['pageTitle' => 'Blast SMS']);
     }
 }

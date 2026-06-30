@@ -128,10 +128,10 @@
                         <option value="">Auto — most recently active device</option>
                         @forelse($devices as $device)
                             <option value="{{ $device->id }}">
-                                {{ substr($device->public_id, 0, 8) }}…  |  Last seen {{ $device->last_seen_at?->diffForHumans() ?? 'never' }}
+                                {{ substr($device->public_id, 0, 8) }}…  |  {{ ucfirst($device->status) }}  |  Last seen {{ $device->last_seen_at?->diffForHumans() ?? 'never' }}
                             </option>
                         @empty
-                            <option disabled>No active devices available</option>
+                            <option disabled>No devices with FCM token registered</option>
                         @endforelse
                     </select>
                     @error('deviceId')
@@ -141,7 +141,7 @@
                 @if($devices->isEmpty())
                     <p class="font-body-sm text-body-sm text-error flex items-center gap-1 sm:mt-5">
                         <span class="material-symbols-outlined text-[16px]">warning</span>
-                        No active device — messages will be queued but may fail.
+                        No devices registered — messages will fail to send.
                     </p>
                 @endif
             </div>

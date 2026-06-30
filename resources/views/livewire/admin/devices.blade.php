@@ -56,17 +56,32 @@
                                 </div>
                             </td>
                             <td class="px-gutter py-3">
-                                @if($device->status === 'active')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-[#D1FAE5] text-[#065F46]">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
-                                        Active
+                                <button
+                                    wire:click="toggleStatus({{ $device->id }})"
+                                    title="{{ $device->status === 'active' ? 'Click to deactivate' : 'Click to activate' }}"
+                                    class="inline-flex items-center gap-2 group"
+                                >
+                                    {{-- Toggle track --}}
+                                    <span @class([
+                                        'relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200',
+                                        'bg-green-500' => $device->status === 'active',
+                                        'bg-gray-300'  => $device->status !== 'active',
+                                    ])>
+                                        {{-- Toggle thumb --}}
+                                        <span @class([
+                                            'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200',
+                                            'translate-x-4' => $device->status === 'active',
+                                            'translate-x-0' => $device->status !== 'active',
+                                        ])></span>
                                     </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-[#F3F4F6] text-[#374151]">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
-                                        Inactive
+                                    <span @class([
+                                        'font-label-sm text-label-sm uppercase',
+                                        'text-[#065F46]' => $device->status === 'active',
+                                        'text-[#6B7280]' => $device->status !== 'active',
+                                    ])>
+                                        {{ ucfirst($device->status) }}
                                     </span>
-                                @endif
+                                </button>
                             </td>
                             <td class="px-gutter py-3">
                                 @if($device->fcm_token)
