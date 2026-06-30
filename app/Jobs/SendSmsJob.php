@@ -43,10 +43,9 @@ class SendSmsJob implements ShouldQueue
             return;
         }
 
-        $device = Device::where('status', 'active')
-            ->whereNotNull('fcm_token')
-            ->latest('last_seen_at')
-            ->first();
+        $device = $message->device_id
+            ? Device::where('id', $message->device_id)->where('status', 'active')->whereNotNull('fcm_token')->first()
+            : Device::where('status', 'active')->whereNotNull('fcm_token')->latest('last_seen_at')->first();
 
         if ($device === null) {
             $message->update([

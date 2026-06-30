@@ -10,6 +10,11 @@ class Devices extends Component
 {
     use WithPagination;
 
+    public function deleteDevice(int $id): void
+    {
+        Device::findOrFail($id)->delete();
+    }
+
     public function render(): \Illuminate\View\View
     {
         return view('livewire.admin.devices', [

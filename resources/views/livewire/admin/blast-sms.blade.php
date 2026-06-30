@@ -49,7 +49,7 @@
             {{-- Message body --}}
             <section class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-3">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">
+                    <label for="blast-content" class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">
                         Message Content
                     </label>
                     <p class="font-body-sm text-body-sm text-on-surface-variant">
@@ -59,6 +59,7 @@
 
                 <div class="relative flex-1">
                     <textarea
+                        id="blast-content"
                         wire:model="content"
                         rows="16"
                         placeholder="Type your message here…"
@@ -83,7 +84,7 @@
             {{-- Recipients --}}
             <section class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-3">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">
+                    <label for="blast-recipients" class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">
                         Recipients
                     </label>
                     <p class="font-body-sm text-body-sm text-on-surface-variant">
@@ -92,6 +93,7 @@
                 </div>
 
                 <textarea
+                    id="blast-recipients"
                     wire:model="recipients"
                     rows="16"
                     placeholder="+9665XXXXXXXX&#10;+9735XXXXXXXX&#10;+9665XXXXXXXX"
@@ -111,6 +113,38 @@
                     </p>
                 @enderror
             </section>
+
+            {{-- Device selector --}}
+            <div class="lg:col-span-2 bg-surface border border-outline-variant rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex-1">
+                    <label for="blast-device" class="block font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">
+                        Sending Device
+                    </label>
+                    <select
+                        id="blast-device"
+                        wire:model="deviceId"
+                        class="w-full bg-white border border-outline-variant rounded-lg py-2 px-3 text-body-md focus:ring-2 focus:ring-primary/10 focus:border-primary cursor-pointer"
+                    >
+                        <option value="">Auto — most recently active device</option>
+                        @forelse($devices as $device)
+                            <option value="{{ $device->id }}">
+                                {{ substr($device->public_id, 0, 8) }}…  |  Last seen {{ $device->last_seen_at?->diffForHumans() ?? 'never' }}
+                            </option>
+                        @empty
+                            <option disabled>No active devices available</option>
+                        @endforelse
+                    </select>
+                    @error('deviceId')
+                        <p class="font-body-sm text-body-sm text-error mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                @if($devices->isEmpty())
+                    <p class="font-body-sm text-body-sm text-error flex items-center gap-1 sm:mt-5">
+                        <span class="material-symbols-outlined text-[16px]">warning</span>
+                        No active device — messages will be queued but may fail.
+                    </p>
+                @endif
+            </div>
 
             {{-- Send bar --}}
             <div class="lg:col-span-2 flex items-center justify-between bg-surface border border-outline-variant rounded-xl px-5 py-4">

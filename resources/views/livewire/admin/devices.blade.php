@@ -17,6 +17,7 @@
                         <th class="px-gutter py-3 font-label-md text-label-md text-on-surface-variant uppercase">Last Seen</th>
                         <th class="px-gutter py-3 font-label-md text-label-md text-on-surface-variant uppercase">Messages</th>
                         <th class="px-gutter py-3 font-label-md text-label-md text-on-surface-variant uppercase">Registered</th>
+                        <th class="px-gutter py-3 font-label-md text-label-md text-on-surface-variant uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant">
@@ -112,10 +113,21 @@
                             <td class="px-gutter py-3 text-body-sm text-on-surface-variant whitespace-nowrap">
                                 {{ $device->created_at->format('M d, Y') }}
                             </td>
+                            <td class="px-gutter py-3">
+                                <button
+                                    wire:click="deleteDevice({{ $device->id }})"
+                                    wire:confirm="Delete this device? Its message history will be kept but unlinked."
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-error border border-error/30 hover:bg-error/10 font-label-sm text-label-sm transition-colors disabled:opacity-50"
+                                >
+                                    <span class="material-symbols-outlined text-[15px]">delete</span>
+                                    Remove
+                                </button>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-gutter py-10 text-center text-body-sm text-on-surface-variant">
+                            <td colspan="7" class="px-gutter py-10 text-center text-body-sm text-on-surface-variant">
                                 No devices registered yet.
                             </td>
                         </tr>

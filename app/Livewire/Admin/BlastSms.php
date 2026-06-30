@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Jobs\SendSmsJob;
+use App\Models\Device;
 use App\Models\Message;
 use Livewire\Component;
 
@@ -10,6 +11,7 @@ class BlastSms extends Component
 {
     public string $content = '';
     public string $recipients = '';
+    public ?int $deviceId = null;
     public bool $dispatched = false;
     public int $queued = 0;
     /** @var string[] */
@@ -21,6 +23,7 @@ class BlastSms extends Component
         return [
             'content'    => ['required', 'string', 'max:1000'],
             'recipients' => ['required', 'string'],
+            'deviceId'   => ['nullable', 'integer', 'exists:devices,id'],
         ];
     }
 
@@ -42,9 +45,10 @@ class BlastSms extends Component
             }
 
             $message = Message::create([
-                'to'      => $number,
-                'content' => trim($this->content),
-                'status'  => 'pending',
+                'to'        => $number,
+                'content'   => trim($this->content),
+                'status'    => 'pending',
+                'device_id' => $this->deviceId,
             ]);
 
             SendSmsJob::dispatch($message->id);
@@ -65,7 +69,8 @@ class BlastSms extends Component
 
     public function render(): \Illuminate\View\View
     {
-        return view('livewire.admin.blast-sms')
-            ->layout('layouts.admin', ['pageTitle' => 'Blast SMS']);
+        return view('livewire.admin.blast-sms', [
+            'devices' => Device::where('status', 'active')->whereNotNull('fcm_token')->latest('last_seen_at')->get(),
+        ])->layout('layouts.admin', ['pageTitle' => 'Blast SMS']);
     }
 }
