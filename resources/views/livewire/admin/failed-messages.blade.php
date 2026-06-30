@@ -143,7 +143,7 @@
                 Showing {{ $messages->firstItem() ?? 0 }}–{{ $messages->lastItem() ?? 0 }}
                 of {{ $messages->total() }} failed messages
             </span>
-            {{ $messages->links('pagination::tailwind') }}
+            {{ $messages->links() }}
         </div>
     </div>
 </div>

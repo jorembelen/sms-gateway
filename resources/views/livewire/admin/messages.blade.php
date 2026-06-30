@@ -147,7 +147,7 @@
                 Showing <span class="font-semibold text-on-surface">{{ $messages->firstItem() ?? 0 }}–{{ $messages->lastItem() ?? 0 }}</span>
                 of <span class="font-semibold text-on-surface">{{ $messages->total() }}</span>
             </span>
-            {{ $messages->links('pagination::tailwind') }}
+            {{ $messages->links() }}
         </div>
     </div>
 

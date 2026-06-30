@@ -157,7 +157,7 @@
                 Showing <span class="font-semibold text-on-surface">{{ $devices->firstItem() ?? 0 }}–{{ $devices->lastItem() ?? 0 }}</span>
                 of <span class="font-semibold text-on-surface">{{ $devices->total() }}</span>
             </span>
-            {{ $devices->links('pagination::tailwind') }}
+            {{ $devices->links() }}
         </div>
     </div>
 </div>
