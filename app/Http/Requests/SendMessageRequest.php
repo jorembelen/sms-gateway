@@ -27,7 +27,7 @@ class SendMessageRequest extends FormRequest
         return [
             // Basic E.164-ish phone format: optional leading +, 7-15 digits.
             'to' => ['required', 'string', 'regex:/^\+?[0-9]{7,15}$/'],
-            'content' => ['required', 'string', 'max:320'],
+            'content' => ['required', 'string', 'max:520'],
         ];
     }
 

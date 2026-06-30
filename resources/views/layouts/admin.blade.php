@@ -239,6 +239,17 @@
                 <span class="material-symbols-outlined">report_problem</span>
                 <span class="font-label-md text-label-md">Failed / Alerts</span>
             </a>
+
+            <a href="{{ route('admin.blast') }}" @class([
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 ease-in-out',
+                'text-primary bg-secondary-container font-bold' => request()->routeIs(
+                    'admin.blast'),
+                'text-on-surface-variant hover:bg-surface-container-high hover:text-primary' => !request()->routeIs(
+                    'admin.blast'),
+            ])>
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="font-label-md text-label-md">Blast SMS</span>
+            </a>
         </nav>
 
         <div class="px-4 py-6 border-t border-outline-variant space-y-1">
