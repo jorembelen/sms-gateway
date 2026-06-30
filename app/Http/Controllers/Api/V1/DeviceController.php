@@ -19,10 +19,13 @@ class DeviceController extends Controller
      */
     public function register(RegisterDeviceRequest $request): JsonResponse
     {
-        $device = Device::updateOrCreate(
+        $device = Device::firstOrCreate(
             ['fcm_token' => $request->validated('fcm_token')],
             ['status' => 'active', 'last_seen_at' => now()],
         );
+
+        // Always refresh last_seen_at; do NOT touch status so admin toggles persist.
+        $device->update(['last_seen_at' => now()]);
 
         return response()->json([
             'public_id' => $device->public_id,
