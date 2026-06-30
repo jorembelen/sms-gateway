@@ -273,7 +273,8 @@
                 <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-white text-[18px]">person</span>
                 </div>
-                <span class="font-label-md text-label-md text-on-surface hidden lg:block">Admin</span>
+                <span
+                    class="font-label-md text-label-md text-on-surface hidden lg:block">{{ auth()->user()->name }}</span>
             </div>
         </header>
 

@@ -28,6 +28,9 @@ class TwoFactorAuthTest extends TestCase
     {
         parent::setUp();
 
+        // All tests in this class exercise the OTP path, which only runs in production.
+        $this->app['env'] = 'production';
+
         $this->admin = User::factory()->create([
             'email'        => self::ADMIN_EMAIL,
             'password'     => Hash::make('correct-password'),
@@ -46,7 +49,7 @@ class TwoFactorAuthTest extends TestCase
         Queue::fake();
 
         Livewire::test(Login::class)
-            ->set('email', self::ADMIN_EMAIL)
+            ->set('login', self::ADMIN_EMAIL)
             ->set('password', 'correct-password')
             ->call('submit');
 
@@ -125,7 +128,7 @@ class TwoFactorAuthTest extends TestCase
         Queue::fake();
 
         Livewire::test(Login::class)
-            ->set('email', self::ADMIN_EMAIL)
+            ->set('login', self::ADMIN_EMAIL)
             ->set('password', 'wrong-password')
             ->call('submit')
             ->assertHasErrors('form');
@@ -229,11 +232,65 @@ class TwoFactorAuthTest extends TestCase
         Queue::fake();
 
         Livewire::test(Login::class)
-            ->set('email', self::ADMIN_EMAIL)
+            ->set('login', self::ADMIN_EMAIL)
             ->set('password', 'correct-password')
             ->call('submit');
 
         Queue::assertPushed(SendSmsJob::class);
         $this->assertDatabaseHas('messages', ['to' => '+639123456789', 'status' => 'pending']);
+    }
+
+    // -----------------------------------------------------------------------
+    // 11. Username login — resolves to the same user as email login
+    // -----------------------------------------------------------------------
+
+    public function test_login_with_username_works_as_alternative_to_email(): void
+    {
+        $this->admin->update(['username' => 'testadmin']);
+
+        Queue::fake();
+
+        Livewire::test(Login::class)
+            ->set('login', 'testadmin')
+            ->set('password', 'correct-password')
+            ->call('submit')
+            ->assertHasNoErrors();
+
+        $this->assertEquals($this->admin->id, session('admin_otp_pending'));
+    }
+
+    public function test_wrong_username_returns_credentials_error(): void
+    {
+        Queue::fake();
+
+        Livewire::test(Login::class)
+            ->set('login', 'nonexistent')
+            ->set('password', 'correct-password')
+            ->call('submit')
+            ->assertHasErrors('form');
+
+        $this->assertDatabaseCount('otp_codes', 0);
+    }
+
+    // -----------------------------------------------------------------------
+    // 13. Non-production env — OTP is skipped, user is logged in immediately
+    // -----------------------------------------------------------------------
+
+    public function test_otp_is_skipped_and_user_logged_in_directly_outside_production(): void
+    {
+        $this->app['env'] = 'local';
+
+        Queue::fake();
+
+        Livewire::test(Login::class)
+            ->set('login', self::ADMIN_EMAIL)
+            ->set('password', 'correct-password')
+            ->call('submit')
+            ->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($this->admin);
+        $this->assertNull(session('admin_otp_pending'));
+        $this->assertDatabaseCount('otp_codes', 0);
+        Queue::assertNothingPushed();
     }
 }

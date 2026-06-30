@@ -20,20 +20,20 @@
 
         <form wire:submit="submit">
             <div class="mb-4">
-                <label for="email" class="block text-xs font-medium text-on-surface-variant uppercase tracking-wider mb-1.5">
-                    Email address
+                <label for="login" class="block text-xs font-medium text-on-surface-variant uppercase tracking-wider mb-1.5">
+                    Email or Username
                 </label>
                 <input
-                    id="email"
-                    wire:model="email"
-                    type="email"
+                    id="login"
+                    wire:model="login"
+                    type="text"
                     required
                     autofocus
-                    autocomplete="email"
-                    class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm text-on-surface bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('email') border-red-400 @enderror"
-                    placeholder="admin@example.com"
+                    autocomplete="username"
+                    class="w-full border border-outline-variant rounded-lg px-3 py-2.5 text-sm text-on-surface bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all @error('login') border-red-400 @enderror"
+                    placeholder="admin@example.com or username"
                 />
-                @error('email')
+                @error('login')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>

@@ -13,10 +13,21 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'jorembelen@gmail.com'],
             [
-                'name'         => 'Admin',
+                'name'         => 'Jorem Belen',
+                'username'     => 'jorem.belen',
                 'password'     => Hash::make('password'),
                 // Replace with your real phone number before first login.
                 'phone_number' => '+966509740359',
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'test@user.com'],
+            [
+                'name'         => 'Test User',
+                'username'     => 'user',
+                'password'     => Hash::make('password'),
+                // Replace with your real phone number before first login.
+                'phone_number' => '+639215275260',
             ]
         );
     }

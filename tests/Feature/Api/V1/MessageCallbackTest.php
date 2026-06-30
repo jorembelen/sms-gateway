@@ -21,7 +21,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'sent',
         ], $this->withKey());
@@ -37,7 +37,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'delivered',
         ], $this->withKey());
@@ -50,20 +50,21 @@ class MessageCallbackTest extends TestCase
     {
         $device = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
+        $reason = 'SIM card not found';
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'failed',
-            'failure_reason' => 'SIM card not found',
+            'failure_reason' => $reason,
         ], $this->withKey());
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['status' => 'failed', 'failure_reason' => 'SIM card not found']);
+            ->assertJsonFragment(['status' => 'failed', 'failure_reason' => $reason]);
 
         $this->assertDatabaseHas('messages', [
             'id' => $message->id,
             'status' => 'failed',
-            'failure_reason' => 'SIM card not found',
+            'failure_reason' => $reason,
         ]);
     }
 
@@ -73,7 +74,7 @@ class MessageCallbackTest extends TestCase
         $otherDevice = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $assignedDevice->id]);
 
-        $response = $this->postJson("/api/v1/devices/{$otherDevice->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$otherDevice->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'sent',
         ], $this->withKey());
@@ -87,7 +88,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create();
         $message = Message::factory()->withoutDevice()->create();
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'sent',
         ], $this->withKey());
@@ -101,7 +102,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create(['last_seen_at' => now()->subHour()]);
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
 
-        $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'sent',
         ], $this->withKey());
@@ -114,7 +115,7 @@ class MessageCallbackTest extends TestCase
     {
         $device = Device::factory()->active()->create();
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => 99999,
             'status' => 'sent',
         ], $this->withKey());
@@ -128,7 +129,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'invalid-status',
         ], $this->withKey());
@@ -141,7 +142,7 @@ class MessageCallbackTest extends TestCase
     {
         $message = Message::factory()->withoutDevice()->create();
 
-        $response = $this->postJson('/api/v1/devices/99999/callback', [
+        $response = $this->postJson('/api/v1/devices/00000000-0000-0000-0000-000000000000/callback', [
             'message_id' => $message->id,
             'status' => 'sent',
         ], $this->withKey());
@@ -154,7 +155,7 @@ class MessageCallbackTest extends TestCase
         $device = Device::factory()->active()->create();
         $message = Message::factory()->pending()->create(['device_id' => $device->id]);
 
-        $response = $this->postJson("/api/v1/devices/{$device->id}/callback", [
+        $response = $this->postJson("/api/v1/devices/{$device->public_id}/callback", [
             'message_id' => $message->id,
             'status' => 'failed',
             'failure_reason' => str_repeat('a', 256),

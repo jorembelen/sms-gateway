@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Device>
@@ -13,6 +14,7 @@ class DeviceFactory extends Factory
     public function definition(): array
     {
         return [
+            'public_id' => (string) Str::uuid(),
             'fcm_token' => fake()->uuid(),
             'status' => fake()->randomElement(['active', 'inactive']),
             'last_seen_at' => fake()->optional(0.8)->dateTimeBetween('-30 days', 'now'),

@@ -22,7 +22,38 @@
                 <tbody class="divide-y divide-outline-variant">
                     @forelse($devices as $device)
                         <tr class="hover:bg-surface-container-low transition-colors group">
-                            <td class="px-gutter py-3 font-label-sm text-label-sm text-outline">#{{ $device->id }}</td>
+                            <td class="px-gutter py-3">
+                                <div
+                                    class="flex items-center gap-2"
+                                    x-data="{ copied: false }"
+                                    data-public-id="{{ $device->public_id }}"
+                                >
+                                    <span class="font-mono font-label-sm text-label-sm text-outline">
+                                        {{ substr($device->public_id, 0, 8) }}…
+                                    </span>
+                                    <button
+                                        @click.stop="
+                                            navigator.clipboard.writeText($el.closest('[data-public-id]').dataset.publicId);
+                                            copied = true;
+                                            setTimeout(() => copied = false, 2000);
+                                        "
+                                        class="flex-shrink-0 p-1 rounded hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary"
+                                        :title="copied ? 'Copied!' : 'Copy full ID'"
+                                    >
+                                        <span class="material-symbols-outlined text-[16px]" x-text="copied ? 'check' : 'content_copy'"></span>
+                                    </button>
+                                    <span
+                                        x-show="copied"
+                                        x-transition:enter="transition ease-out duration-150"
+                                        x-transition:enter-start="opacity-0"
+                                        x-transition:enter-end="opacity-100"
+                                        x-transition:leave="transition ease-in duration-100"
+                                        x-transition:leave-start="opacity-100"
+                                        x-transition:leave-end="opacity-0"
+                                        class="text-[11px] text-green-600 font-bold"
+                                    >Copied!</span>
+                                </div>
+                            </td>
                             <td class="px-gutter py-3">
                                 @if($device->status === 'active')
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-[#D1FAE5] text-[#065F46]">

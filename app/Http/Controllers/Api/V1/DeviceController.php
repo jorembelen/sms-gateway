@@ -25,7 +25,7 @@ class DeviceController extends Controller
         );
 
         return response()->json([
-            'id' => $device->id,
+            'public_id' => $device->public_id,
             'status' => $device->status,
             'last_seen_at' => $device->last_seen_at,
         ], 200);

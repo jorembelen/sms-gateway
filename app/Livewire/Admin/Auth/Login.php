@@ -11,7 +11,7 @@ use Livewire\Component;
 #[Layout('layouts.auth')]
 class Login extends Component
 {
-    public string $email = '';
+    public string $login = '';
     public string $password = '';
 
     public function mount(): void
@@ -24,15 +24,25 @@ class Login extends Component
     public function submit(OtpService $otp): void
     {
         $this->validate([
-            'email'    => ['required', 'email'],
+            'login'    => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $this->email)->first();
+        $field = filter_var($this->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $user = User::where($field, $this->login)->first();
 
-        // Constant-time failure path — don't reveal whether email exists.
+        // Constant-time failure path — don't reveal whether the identifier exists.
         if (! $user || ! Hash::check($this->password, $user->password)) {
             $this->addError('form', 'These credentials do not match our records.');
+
+            return;
+        }
+
+        // Skip OTP in non-production environments (local/staging dev convenience).
+        if (! app()->isProduction()) {
+            auth()->login($user);
+            session()->regenerate();
+            $this->redirectRoute('admin.dashboard', navigate: false);
 
             return;
         }

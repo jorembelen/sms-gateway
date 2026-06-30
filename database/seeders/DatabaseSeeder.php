@@ -16,12 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminUserSeeder::class);
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-        // // Active devices with messages in every status
+        // Active devices with messages in every status
         // $activeDevices = Device::factory(3)->active()->create();
 
         // foreach ($activeDevices as $device) {
