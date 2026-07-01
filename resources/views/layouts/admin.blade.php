@@ -232,6 +232,17 @@
                 <span class="font-label-md text-label-md">Devices</span>
             </a>
 
+            <a href="{{ route('admin.incoming') }}" @class([
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 ease-in-out',
+                'text-primary bg-secondary-container font-bold' => request()->routeIs(
+                    'admin.incoming'),
+                'text-on-surface-variant hover:bg-surface-container-high hover:text-primary' => !request()->routeIs(
+                    'admin.incoming'),
+            ])>
+                <span class="material-symbols-outlined">move_to_inbox</span>
+                <span class="font-label-md text-label-md">Incoming</span>
+            </a>
+
             <a href="{{ route('admin.failed') }}" @class([
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 ease-in-out',
                 'text-primary bg-secondary-container font-bold' => request()->routeIs(

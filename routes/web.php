@@ -8,6 +8,7 @@ use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\QueueMonitor;
 use App\Livewire\Admin\Devices;
 use App\Livewire\Admin\FailedMessages;
+use App\Livewire\Admin\IncomingMessages;
 use App\Livewire\Admin\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(AdminAuth::class)->group(function () {
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/messages', Messages::class)->name('messages');
+    Route::get('/incoming', IncomingMessages::class)->name('incoming');
     Route::get('/devices', Devices::class)->name('devices');
     Route::get('/failed', FailedMessages::class)->name('failed');
     Route::get('/blast', BlastSms::class)->name('blast');
